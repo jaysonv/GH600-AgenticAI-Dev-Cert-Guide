@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GH-600 study desk</title>
+<style>
+:root{--bg:#eef1f6;--panel:#fff;--ink:#1b2433;--mute:#566176;--line:#d3d9e5;--accent:#2447d6;--on-accent:#fff;--ok:#1b7a4c;--bad:#b42318;--flag:#955d00;--okbg:#e3f3ea;--badbg:#fbe8e5;--sel:#e6ebff}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1420;--panel:#171f2f;--ink:#e6eaf2;--mute:#9aa6bb;--line:#2b3549;--accent:#8ea2ff;--on-accent:#0c1020;--ok:#5dd39e;--bad:#ff8f84;--flag:#f2b45a;--okbg:#14301f;--badbg:#3a1d1b;--sel:#222c4a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:20px 16px 64px}
+h1{font:700 1.35rem/1.2 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 14px;font-size:.92rem}
+.bp{display:flex;gap:4px;margin:0 0 16px}
+.seg{position:relative;overflow:hidden;min-width:0;height:62px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);cursor:pointer;text-align:left;padding:6px 8px;font:inherit}
+.seg .fill{position:absolute;left:0;right:0;bottom:0;background:var(--sel);z-index:0}
+.seg b,.seg small{position:relative;display:block;z-index:1}
+.seg small{color:var(--mute);font-size:.75rem}
+.seg.on{outline:2px solid var(--accent);outline-offset:1px}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+button{font:inherit;color:inherit}
+.tab,.btn{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:8px 14px;cursor:pointer}
+.tab[aria-current=page]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px}
+.serif{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;font-size:1.18rem;line-height:1.5}
+.meta{color:var(--mute);font-size:.85rem;margin-bottom:8px;display:flex;justify-content:space-between;gap:8px}
+.card{min-height:170px;cursor:pointer;display:flex;align-items:center}
+.opts{display:grid;gap:8px;margin:14px 0}
+.opt{display:flex;gap:10px;text-align:left;border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:10px 12px;cursor:pointer;align-items:flex-start}
+.opt i{font-style:normal;font-weight:700;min-width:1.4em;color:var(--mute)}
+.opt[aria-pressed=true]{background:var(--sel);border-color:var(--accent)}
+.opt.right{background:var(--okbg);border-color:var(--ok)}
+.opt.wrong{background:var(--badbg);border-color:var(--bad)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.why{border-left:4px solid var(--accent);padding:6px 12px;margin-top:12px;background:var(--bg)}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.flag{color:var(--flag)}
+.grid{display:flex;flex-wrap:wrap;gap:4px;margin:12px 0}
+.grid button{width:34px;height:30px;border:1px solid var(--line);border-radius:4px;background:var(--panel);cursor:pointer;font-size:.8rem}
+.grid .done{background:var(--sel)}.grid .cur{outline:2px solid var(--accent)}.grid .fl{border-color:var(--flag);border-width:2px}
+table{border-collapse:collapse;width:100%}td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:.92rem}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;min-width:80px}.bar span{display:block;height:100%;background:var(--accent)}
+details{margin:8px 0}summary{cursor:pointer}
+@media (max-width:560px){.seg{height:54px;padding:4px 5px}.seg small{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script src="data.js"></script>
+<script>
+"use strict";
+const D = window.GH600;
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("gh600." + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem("gh600." + k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
+};
+let view = "cards", dom = 0, S = null, tick = null;
+const L = "ABCDEFGH";
+const INTERVAL = { 1: 0, 2: 1, 3: 3, 4: 7, 5: 14 };
+
+function h(tag, props, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (k === "class") e.className = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (v === true) e.setAttribute(k, "");
+    else if (v !== false && v != null) e.setAttribute(k, v);
+  }
+  for (const c of kids.flat()) { if (c != null && c !== false) e.append(c.nodeType ? c : document.createTextNode(c)); }
+  return e;
+}
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const grade = (q, a) => q.type === "order" ? same(a, q.a) : same([...new Set(a)].sort(), [...q.a].sort());
+const label = (q, i) => q.type === "order" ? String(i + 1) : L[i];
+const ready = (q, sel) => q.type === "order" ? sel.length === q.o.length : sel.length > 0;
+function toggle(q, sel, i) {
+  if (q.type === "single") return [i];
+  if (q.type === "multi") return sel.includes(i) ? sel.filter(x => x !== i) : [...sel, i];
+  return sel.includes(i) ? sel.slice(0, sel.indexOf(i)) : [...sel, i];
+}
+function accuracy() {
+  const a = {};
+  for (const r of store.get("hist", [])) for (const [d, [c, t]] of Object.entries(r.per)) { a[d] = a[d] || [0, 0]; a[d][0] += c; a[d][1] += t; }
+  return a;
+}
+function record(mode, per) { const h2 = store.get("hist", []); h2.push({ t: new Date().toISOString(), mode, per }); store.set("hist", h2); }
+const tally = (per, q, ok) => { const p = per[q.d] = per[q.d] || [0, 0]; p[0] += ok ? 1 : 0; p[1] += 1; };
+
+/* ---------- chrome ---------- */
+function header() {
+  const acc = accuracy();
+  return h("header", {},
+    h("h1", {}, "GH-600 study desk"),
+    h("p", { class: "sub" }, "Segments are sized by exam weight and filled by your accuracy. Select one to focus cards and practice on that domain."),
+    h("div", { class: "bp", role: "group", "aria-label": "Exam domains" }, Object.keys(D.domains).map(d => {
+      const a = acc[d], pct = a && a[1] ? Math.round(100 * a[0] / a[1]) : null;
+      return h("button", { class: "seg" + (dom == d ? " on" : ""), style: "flex:" + D.weights[d] * 1000, title: D.domains[d], "aria-pressed": dom == d,
+        onclick: () => { dom = dom == d ? 0 : +d; go(view); } },
+        h("span", { class: "fill", style: "height:" + (pct || 0) + "%" }), h("b", {}, "D" + d), h("small", {}, pct == null ? "no data" : pct + "%"));
+    })));
+}
+function nav() {
+  const tabs = [["cards", "Flashcards"], ["practice", "Practice"], ["exam", "Exam simulator"], ["progress", "Progress"]];
+  return h("nav", { "aria-label": "Mode" }, tabs.map(([k, t]) => h("button", { class: "tab", "aria-current": view === k ? "page" : null, onclick: () => go(k) }, t)));
+}
+function render() {
+  $app().replaceChildren(header(), nav(), body());
+}
+const $app = () => document.getElementById("app");
+function go(v) {
+  clearInterval(tick); view = v; S = null;
+  if (v === "cards") startCards(false);
+  if (v === "practice") startPractice();
+  render();
+}
+
+/* ---------- flashcards ---------- */
+function startCards(all) {
+  const st = store.get("cards", {}), today = new Date().toISOString().slice(0, 10);
+  let deck = D.cards.filter(c => !dom || c.d == dom);
+  const due = deck.filter(c => (st[c.id] ? st[c.id].due : "0") <= today);
+  S = { mode: "cards", deck: shuffle(all ? deck : due), i: 0, flip: false, known: 0, total: deck.length };
+}
+function rateCard(knew) {
+  const st = store.get("cards", {}), c = S.deck[S.i];
+  const box = knew ? Math.min(5, (st[c.id] ? st[c.id].box : 1) + 1) : 1;
+  const due = new Date(Date.now() + INTERVAL[box] * 864e5).toISOString().slice(0, 10);
+  st[c.id] = { box, due }; store.set("cards", st);
+  S.known += knew ? 1 : 0; S.i++; S.flip = false; render();
+}
+function cardsView() {
+  if (S.i >= S.deck.length) {
+    return h("div", { class: "panel" }, h("p", {}, S.deck.length ? `Session done. You knew ${S.known} of ${S.deck.length}.` : "Nothing is due for this selection."),
+      h("button", { class: "btn", onclick: () => { startCards(true); render(); } }, "Review all cards in this selection (" + S.total + ")"));
+  }
+  const c = S.deck[S.i];
+  return h("div", {}, h("div", { class: "meta" }, h("span", {}, `Card ${S.i + 1} of ${S.deck.length}`), h("span", {}, "Domain " + c.d)),
+    h("div", { class: "panel card serif", tabindex: 0, role: "button", "aria-label": "Flip card", onclick: () => { S.flip = !S.flip; render(); } }, S.flip ? c.back : c.front),
+    h("div", { class: "row", style: "margin-top:12px" },
+      !S.flip ? h("button", { class: "btn primary", onclick: () => { S.flip = true; render(); } }, "Show answer (Space)") : [
+        h("button", { class: "btn", onclick: () => rateCard(false) }, "Missed it (1)"),
+        h("button", { class: "btn primary", onclick: () => rateCard(true) }, "Knew it (2)")]));
+}
+
+/* ---------- question rendering (shared) ---------- */
+function questionBlock(q, sel, locked, onPick) {
+  return h("div", {}, h("p", { class: "serif" }, q.q),
+    q.type === "multi" ? h("div", { class: "meta" }, "Select all that apply.") : null,
+    q.type === "order" ? h("div", { class: "meta" }, "Click the options in the correct order. Click a chosen option to undo from there.") : null,
+    h("div", { class: "opts" }, q.o.map((o, i) => {
+      const pos = sel.indexOf(i);
+      let cls = "opt";
+      if (locked) { if (q.type === "order") cls += q.a.indexOf(i) === pos ? " right" : (pos >= 0 ? " wrong" : ""); else cls += q.a.includes(i) ? " right" : (sel.includes(i) ? " wrong" : ""); }
+      return h("button", { class: cls, "aria-pressed": pos >= 0, disabled: locked, onclick: () => onPick(i) },
+        h("i", {}, q.type === "order" ? (pos >= 0 ? pos + 1 : "·") : L[i]), h("span", {}, o));
+    })));
+}
+function answerText(q) { return q.type === "order" ? q.a.map(i => q.o[i]).join(" → ") : q.a.map(i => L[i]).join(", "); }
+
+/* ---------- practice ---------- */
+function startPractice() {
+  const pool = D.questions.filter(q => !dom || q.d == dom);
+  S = { mode: "practice", qs: shuffle(pool).slice(0, 10), i: 0, sel: [], checked: false, per: {}, saved: false, right: 0 };
+}
+function practiceView() {
+  if (S.i >= S.qs.length) {
+    if (!S.saved) { record("practice", S.per); S.saved = true; }
+    return h("div", { class: "panel" }, h("p", {}, `Finished: ${S.right} of ${S.qs.length} correct.`), h("button", { class: "btn primary", onclick: () => { go("practice"); } }, "Start another set"));
+  }
+  const q = S.qs[S.i], ok = grade(q, S.sel);
+  return h("div", { class: "panel" }, h("div", { class: "meta" }, h("span", {}, `Question ${S.i + 1} of ${S.qs.length}`), h("span", {}, "Domain " + q.d)),
+    questionBlock(q, S.sel, S.checked, i => { S.sel = toggle(q, S.sel, i); render(); }),
+    h("div", { class: "row" },
+      !S.checked ? h("button", { class: "btn primary", disabled: !ready(q, S.sel), onclick: () => { S.checked = true; tally(S.per, q, ok); S.right += ok ? 1 : 0; render(); } }, "Check answer")
+        : h("button", { class: "btn primary", onclick: () => { S.i++; S.sel = []; S.checked = false; render(); } }, "Next (Enter)"),
+      q.type === "order" && !S.checked ? h("button", { class: "btn", onclick: () => { S.sel = []; render(); } }, "Reset order") : null),
+    S.checked ? h("div", { class: "why" }, h("b", { class: ok ? "ok" : "bad" }, ok ? "Correct. " : "Incorrect. "), ok ? "" : "Answer: " + answerText(q) + ". ", q.e, q.ref ? h("div", { class: "meta" }, "Ref: " + q.ref) : null) : null);
+}
+
+/* ---------- exam ---------- */
+function pickExam(n) {
+  const by = {}, quota = {}, base = {}; let used = 0;
+  for (const d of Object.keys(D.domains)) { by[d] = shuffle(D.questions.filter(q => q.d == d)); quota[d] = D.weights[d] * n; base[d] = Math.min(Math.floor(quota[d]), by[d].length); used += base[d]; }
+  const order = Object.keys(by).sort((a, b) => (quota[b] % 1) - (quota[a] % 1));
+  let rem = n - used;
+  while (rem > 0) { let moved = false; for (const d of order) { if (rem > 0 && base[d] < by[d].length) { base[d]++; rem--; moved = true; } } if (!moved) break; }
+  return shuffle(Object.keys(by).flatMap(d => by[d].slice(0, base[d])));
+}
+function startExam(n) {
+  const qs = pickExam(n), minutes = Math.round(120 * qs.length / 60);
+  S = { mode: "exam", running: true, qs, i: 0, ans: {}, flag: new Set(), deadline: Date.now() + minutes * 60000, minutes };
+  clearInterval(tick);
+  tick = setInterval(() => {
+    const t = document.getElementById("timer"); if (!t || !S || S.mode !== "exam" || !S.running) return;
+    const left = Math.max(0, S.deadline - Date.now()); t.textContent = Math.floor(left / 60000) + ":" + String(Math.floor(left % 60000 / 1000)).padStart(2, "0");
+    if (left === 0) finishExam();
+  }, 1000);
+}
+function finishExam() {
+  clearInterval(tick); S.running = false; S.per = {}; S.wrong = [];
+  for (const q of S.qs) { const a = S.ans[q.id], ok = !!a && grade(q, a); tally(S.per, q, ok); if (!ok) S.wrong.push(q); }
+  record("exam", S.per); render();
+}
+function examView() {
+  if (!S) {
+    const max = D.questions.length, def = Math.min(60, max);
+    return h("div", { class: "panel" }, h("p", {}, "Timed simulation using original practice questions, drawn in proportion to the published domain weights. No feedback until the end. The real exam is 120 minutes, scaled-scored, with a pass mark of 700."),
+      h("label", {}, "Questions ", h("input", { id: "n", type: "number", min: 6, max, value: def, style: "width:5em" }), ` (max ${max}; time scales at 2 min each)`),
+      h("p", {}, h("button", { class: "btn primary", onclick: () => { startExam(Math.max(6, Math.min(max, +document.getElementById("n").value || def))); render(); } }, "Start exam")));
+  }
+  if (!S.running) return examResult();
+  const q = S.qs[S.i], sel = S.ans[q.id] || [];
+  return h("div", { class: "panel" }, h("div", { class: "meta" }, h("span", {}, `Question ${S.i + 1} of ${S.qs.length}`), h("span", {}, "Time left ", h("b", { id: "timer" }, Math.floor((S.deadline - Date.now()) / 60000) + ":00"))),
+    questionBlock(q, sel, false, i => { S.ans[q.id] = toggle(q, sel, i); render(); }),
+    h("div", { class: "row" },
+      h("button", { class: "btn", disabled: S.i === 0, onclick: () => { S.i--; render(); } }, "Previous"),
+      h("button", { class: "btn", disabled: S.i === S.qs.length - 1, onclick: () => { S.i++; render(); } }, "Next"),
+      h("button", { class: "btn", onclick: () => { S.flag.has(q.id) ? S.flag.delete(q.id) : S.flag.add(q.id); render(); } }, S.flag.has(q.id) ? "Unflag" : "Flag for review"),
+      q.type === "order" ? h("button", { class: "btn", onclick: () => { S.ans[q.id] = []; render(); } }, "Reset order") : null,
+      h("button", { class: "btn primary", onclick: () => { const open = S.qs.filter(x => !S.ans[x.id] || !ready(x, S.ans[x.id])).length; if (confirm(open ? open + " unanswered. Finish anyway?" : "Finish and score the exam?")) finishExam(); } }, "Finish exam")),
+    h("div", { class: "grid" }, S.qs.map((x, k) => h("button", { class: (S.ans[x.id] && ready(x, S.ans[x.id]) ? "done " : "") + (k === S.i ? "cur " : "") + (S.flag.has(x.id) ? "fl" : ""), "aria-label": "Go to question " + (k + 1), onclick: () => { S.i = k; render(); } }, k + 1))));
+}
+function examResult() {
+  const tot = Object.values(S.per).reduce((a, [c, t]) => [a[0] + c, a[1] + t], [0, 0]);
+  return h("div", { class: "panel" }, h("h2", {}, `Result: ${tot[0]} / ${tot[1]} (${Math.round(100 * tot[0] / tot[1])}%)`),
+    h("p", { class: "meta" }, "The real exam is scaled (700 of 1000 to pass), so treat this percentage as a guide. Aim for 80% or more overall and 70% or more in each domain."),
+    h("table", {}, Object.keys(D.domains).map(d => { const p = S.per[d]; if (!p) return null; const pc = Math.round(100 * p[0] / p[1]);
+      return h("tr", {}, h("td", {}, "D" + d + " " + D.domains[d]), h("td", {}, p[0] + "/" + p[1]), h("td", {}, h("div", { class: "bar" }, h("span", { style: "width:" + pc + "%" })))); })),
+    h("h3", {}, "Review misses (" + S.wrong.length + ")"),
+    S.wrong.map(q => h("details", {}, h("summary", {}, q.q), h("p", {}, h("b", {}, "Answer: "), answerText(q)), h("p", {}, q.e))),
+    h("p", {}, h("button", { class: "btn primary", onclick: () => go("exam") }, "New exam")));
+}
+
+/* ---------- progress ---------- */
+function progressView() {
+  const acc = accuracy(), hist = store.get("hist", []), cards = store.get("cards", {}), boxes = [0, 0, 0, 0, 0, 0];
+  Object.values(cards).forEach(c => boxes[c.box]++);
+  return h("div", { class: "panel" }, h("h3", {}, "Accuracy by domain"),
+    h("table", {}, Object.keys(D.domains).map(d => { const a = acc[d], pc = a && a[1] ? Math.round(100 * a[0] / a[1]) : null;
+      return h("tr", {}, h("td", {}, "D" + d + " " + D.domains[d]), h("td", {}, pc == null ? "no data" : `${a[0]}/${a[1]} (${pc}%)`),
+        h("td", {}, h("div", { class: "bar" }, h("span", { style: "width:" + (pc || 0) + "%" }))), h("td", { class: pc != null && pc < 70 ? "flag" : "" }, pc != null && pc < 70 ? "study more" : "")); })),
+    h("p", {}, `Flashcard boxes: new/missed ${boxes[1]}, box 2 ${boxes[2]}, box 3 ${boxes[3]}, box 4 ${boxes[4]}, mastered ${boxes[5]}. Attempts logged: ${hist.length}.`),
+    h("p", { class: "meta" }, "Progress is stored only in this browser (localStorage)."),
+    h("button", { class: "btn", onclick: () => { if (confirm("Erase all saved progress in this browser?")) { store.set("hist", []); store.set("cards", {}); render(); } } }, "Reset progress"));
+}
+
+function body() {
+  if (view === "cards") return cardsView();
+  if (view === "practice") return practiceView();
+  if (view === "exam") return examView();
+  return progressView();
+}
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT" || !S) return;
+  if (S.mode === "cards" && S.i < S.deck.length) {
+    if (e.key === " ") { e.preventDefault(); S.flip = !S.flip; render(); }
+    else if (S.flip && e.key === "1") rateCard(false);
+    else if (S.flip && e.key === "2") rateCard(true);
+  } else if (S.mode === "practice" && S.checked && e.key === "Enter") { S.i++; S.sel = []; S.checked = false; render(); }
+});
+go("cards");
+</script>
+</body>
+</html>

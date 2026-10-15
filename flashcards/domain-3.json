@@ -1,0 +1,22 @@
+[
+{"id":"D3-C01","d":3,"front":"Short-term vs long-term vs external memory?","back":"Short-term: current context window/session. Long-term: persisted across sessions (Copilot Memory, instructions). External: systems of record (issues, PRs, files, databases)."},
+{"id":"D3-C02","d":3,"front":"What does Copilot Memory store?","back":"Repository-level facts and user-level preferences."},
+{"id":"D3-C03","d":3,"front":"How are repo-level facts validated?","back":"Stored with citations to code; checked against the current branch before use; only validated facts are used."},
+{"id":"D3-C04","d":3,"front":"Copilot Memory expiry rule?","back":"Entries unused for 28 days are deleted automatically; successful validation/use can reset the timer."},
+{"id":"D3-C05","d":3,"front":"Who can cause repo-level facts to be created?","back":"Users with write access to the repo who have Copilot Memory enabled."},
+{"id":"D3-C06","d":3,"front":"Who can review and delete repo-level facts?","back":"Repository owners."},
+{"id":"D3-C07","d":3,"front":"Who can see user-level preferences?","back":"Only that user's interactions; the user can view/delete them; admins can export/delete on Business/Enterprise."},
+{"id":"D3-C08","d":3,"front":"Which features use Copilot Memory?","back":"Cloud agent, code review, Copilot CLI and agentic autofix. Code review uses repo-level facts only."},
+{"id":"D3-C09","d":3,"front":"How is Copilot Memory enabled?","back":"Per user. Org/enterprise admins enable the policy first, then users can opt out. Individual plans: on by default."},
+{"id":"D3-C10","d":3,"front":"Where should stable conventions live vs task progress?","back":"Conventions in reviewed instruction files; progress and decisions in durable external artifacts (PR checklist, PROGRESS.md, issue comments)."},
+{"id":"D3-C11","d":3,"front":"Name 4 durable state artifacts.","back":"PR description checklist, progress/decision file on the branch, issue comments, explanatory commit messages."},
+{"id":"D3-C12","d":3,"front":"How should an agent resume interrupted work?","back":"Read artifacts and diff, verify recorded state against reality, use idempotent steps, honor prior decisions unless superseded with a note."},
+{"id":"D3-C13","d":3,"front":"What is context drift?","back":"Gradual divergence from the original intent in long runs: forgotten constraints, scope creep, contradicted decisions."},
+{"id":"D3-C14","d":3,"front":"How do you detect drift?","back":"Compare work to acceptance criteria/plan at checkpoints; watch diff size vs scope and violations of instructions."},
+{"id":"D3-C15","d":3,"front":"How do you correct drift?","back":"Re-anchor goal and constraints, revert off-scope changes, split the task, restart a fresh session seeded from artifacts."},
+{"id":"D3-C16","d":3,"front":"How do you share agent state across tools?","back":"Through repository and GitHub objects and shared memory, not chat history."},
+{"id":"D3-C17","d":3,"front":"How do you prevent conflicting context?","back":"One source of truth per fact; resolve contradictions by fixing or deleting one source."},
+{"id":"D3-C18","d":3,"front":"How do you prevent stale context?","back":"Validate against current code, expire entries, re-verify before acting."},
+{"id":"D3-C19","d":3,"front":"Why scope memory to task-relevant info?","back":"Irrelevant context buries key instructions, raises cost and causes errors; use path-specific instructions and focused links."},
+{"id":"D3-C20","d":3,"front":"What should a memory pruning/reset policy define?","back":"Who writes, how validated, when it expires, who can delete, how to reset."}
+]

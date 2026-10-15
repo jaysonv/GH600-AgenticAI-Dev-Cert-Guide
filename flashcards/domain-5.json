@@ -1,0 +1,22 @@
+[
+{"id":"D5-C01","d":5,"front":"Orchestrator-worker pattern?","back":"A coordinator decomposes work, delegates to specialized agents and aggregates results (hub-and-spoke)."},
+{"id":"D5-C02","d":5,"front":"Sequential pipeline pattern?","back":"Agents in a chain; each stage consumes the previous output (planner > implementer > tester > reviewer)."},
+{"id":"D5-C03","d":5,"front":"Parallel fan-out/fan-in?","back":"Many agents work independently at once, then results are merged."},
+{"id":"D5-C04","d":5,"front":"Generator-critic (evaluator-optimizer)?","back":"One agent produces, another critiques, looping until criteria are met."},
+{"id":"D5-C05","d":5,"front":"Event-driven pattern?","back":"Agents react to GitHub events such as labels or issue creation."},
+{"id":"D5-C06","d":5,"front":"How do you isolate parallel agents?","back":"Separate branches/sessions/worktrees/environments with disjoint file ownership; share only via commits and artifacts."},
+{"id":"D5-C07","d":5,"front":"Three multi-agent conflict types?","back":"Overlapping code changes, duplicated effort, contradictory outputs."},
+{"id":"D5-C08","d":5,"front":"Resolve overlapping code changes?","back":"Serialize, rebase, re-partition ownership, or integrate via an integrator agent/human."},
+{"id":"D5-C09","d":5,"front":"Prevent duplicated effort?","back":"Claim work before starting (assignment, label, sub-issue) and check existing claims."},
+{"id":"D5-C10","d":5,"front":"Resolve contradictory outputs?","back":"Escalate to an arbiter (human or designated agent) and record the decision in one place."},
+{"id":"D5-C11","d":5,"front":"What goes in a hand-off record?","back":"Who handed what (inputs, outputs, assumptions) to whom, plus decisions and why."},
+{"id":"D5-C12","d":5,"front":"Artifacts that make multi-agent work auditable?","back":"One PR per agent task, linked issues, session logs, scan results, decision log."},
+{"id":"D5-C13","d":5,"front":"Evidence for post-hoc analysis?","back":"Session logs, commit co-author trails, audit log events, PR/issue timelines."},
+{"id":"D5-C14","d":5,"front":"Four failure states to detect?","back":"Failed, partial, stalled, degraded."},
+{"id":"D5-C15","d":5,"front":"Handling a stalled agent?","back":"Detect via timeout/heartbeat; cancel, roll back partial work, re-queue or escalate."},
+{"id":"D5-C16","d":5,"front":"Handling partial execution?","back":"Resume from a checkpoint idempotently or roll back; do not restart blindly."},
+{"id":"D5-C17","d":5,"front":"Circuit breaker?","back":"Stop routing work to an agent that keeps failing/degrading; fall back to a human or alternative while investigating."},
+{"id":"D5-C18","d":5,"front":"Safely add an agent to a live workflow?","back":"Define role, tools and hand-off contract; review its definition via PR; pilot on low-risk tasks."},
+{"id":"D5-C19","d":5,"front":"Safely update or replace an agent?","back":"Version definitions, roll out gradually, drain or hand off in-flight work, keep hand-off contracts backward compatible."},
+{"id":"D5-C20","d":5,"front":"Safely retire an agent?","back":"Stop new routing, finish/reassign in-flight work, preserve logs/PRs/decision records, document the replacement."}
+]

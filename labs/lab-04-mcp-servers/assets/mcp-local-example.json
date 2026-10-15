@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "example-local": {
+      "type": "local",
+      "command": "npx",
+      "args": ["-y", "@example/mcp-server@1.2.3"],
+      "env": {
+        "EXAMPLE_API_KEY": "$COPILOT_MCP_EXAMPLE_API_KEY"
+      },
+      "tools": ["get_item", "list_items"]
+    }
+  }
+}

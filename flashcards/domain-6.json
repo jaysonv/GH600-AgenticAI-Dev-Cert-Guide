@@ -1,0 +1,22 @@
+[
+{"id":"D6-C01","d":6,"front":"How do you classify agent actions for autonomy?","back":"By operational, security and compliance risk (and reversibility); assign the lowest safe level of human involvement."},
+{"id":"D6-C02","d":6,"front":"Goal when assigning autonomy levels?","back":"Maximize delivery speed while remaining compliant with security and Responsible AI standards."},
+{"id":"D6-C03","d":6,"front":"Which actions always need explicit authorization or a controlled path?","back":"Irreversible or compliance-sensitive ones: production deploys, data deletion, secrets and permission changes."},
+{"id":"D6-C04","d":6,"front":"Instructions vs technical enforcement?","back":"Instructions are advisory; allowlists, firewall, rulesets, required checks and hooks cannot be bypassed by the model."},
+{"id":"D6-C05","d":6,"front":"Name five technical guardrails.","back":"Tool allowlists, firewall, rulesets/branch protection, required reviews/CODEOWNERS, push protection/code scanning, org policies, hooks."},
+{"id":"D6-C06","d":6,"front":"Least-privilege MCP/token practice?","back":"Read-only tools and endpoints, fine-grained PAT or GitHub App scoped to specific repos, narrow tools list."},
+{"id":"D6-C07","d":6,"front":"How do you preserve velocity with guardrails?","back":"Risk-based approvals at PR level, async review, auto-allow read-only actions, no approvals that do not reduce risk."},
+{"id":"D6-C08","d":6,"front":"Who can trigger cloud agent?","back":"Users with write access. Comments from users without write access are never shown to it."},
+{"id":"D6-C09","d":6,"front":"Cloud agent PR rules?","back":"Draft PRs need human review and merge; agent cannot mark ready, approve or merge; requester cannot approve."},
+{"id":"D6-C10","d":6,"front":"Extra approval rule?","back":"PRs opened under the agent's own identity need one additional approval if the repo already requires approvals (ruleset default; always for branch protection)."},
+{"id":"D6-C11","d":6,"front":"Workflows on agent PRs?","back":"Do not run until a user with write access clicks Approve and run workflows (configurable)."},
+{"id":"D6-C12","d":6,"front":"Prompt-injection mitigation built into cloud agent?","back":"Hidden characters filtered (for example HTML comments are not passed); non-write users' comments excluded."},
+{"id":"D6-C13","d":6,"front":"Sensitive-data mitigation?","back":"Restricted internet access via the firewall (customizable allowlist)."},
+{"id":"D6-C14","d":6,"front":"Accountability features for agent commits?","back":"Copilot as author, requester as co-author, signed (Verified), link to session logs; admin audit log events."},
+{"id":"D6-C15","d":6,"front":"Automation guardrails?","back":"Attributed to creator, you choose exactly which tools it can use, untrusted-user events ignored by default, workflows still need human approval."},
+{"id":"D6-C16","d":6,"front":"What decisions require human judgment?","back":"Ambiguity, business/ethical trade-offs, security-sensitive and irreversible changes."},
+{"id":"D6-C17","d":6,"front":"How do you gate a production deploy by an agent?","back":"Protected environment with required reviewers (explicit authorization), plus protected branch and checks."},
+{"id":"D6-C18","d":6,"front":"Why is 'approve every tool call' bad?","back":"It adds friction without materially reducing risk; the exam favors risk-proportional controls."},
+{"id":"D6-C19","d":6,"front":"Who is accountable for merged agent code?","back":"Humans: reviewers and the team. 'The agent did it' is not a control."},
+{"id":"D6-C20","d":6,"front":"What does the study guide link for guardrails?","back":"The Build guardrails tutorial and the Risks and mitigations page for cloud agent."}
+]

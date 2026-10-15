@@ -1,0 +1,22 @@
+[
+{"id":"D4-C01","d":4,"front":"Outcomes vs operational constraints?","back":"Outcomes: what must be true (behavior, tests, docs). Constraints: what must not happen (off-limit files, no new deps, budgets)."},
+{"id":"D4-C02","d":4,"front":"Name 4 quantitative evaluation signals.","back":"CI/test pass rate, coverage or test-count change, scan findings (CodeQL, lint), diff size vs scope, review iterations, time to merge, revert rate, cost."},
+{"id":"D4-C03","d":4,"front":"Name 3 qualitative signals.","back":"Reviewer judgment of correctness/clarity, adherence to conventions, PR description quality, trust to merge."},
+{"id":"D4-C04","d":4,"front":"What does 'align evaluation with development intent' protect against?","back":"Gaming metrics, e.g. deleting a failing test or swallowing exceptions so checks go green without solving the real problem."},
+{"id":"D4-C05","d":4,"front":"Cloud agent's built-in validation tools?","back":"CodeQL, Advisory Database check for new dependencies, secret scanning, plus Copilot code review. No GHAS license required."},
+{"id":"D4-C06","d":4,"front":"Where do you inspect what an agent did and saw?","back":"Session logs (also plans, tool-call traces, outputs, PR timeline, workflow artifacts)."},
+{"id":"D4-C07","d":4,"front":"Three root-cause classes?","back":"Reasoning errors, tool misuse, context/environment issues."},
+{"id":"D4-C08","d":4,"front":"Example of a reasoning error?","back":"Misreading the requirement, scope creep, ignoring a stated constraint, wrong plan."},
+{"id":"D4-C09","d":4,"front":"Example of tool misuse?","back":"Wrong arguments, wrong tool, repeating a failing call, denied tool, MCP server not started."},
+{"id":"D4-C10","d":4,"front":"Example of context/environment issue?","back":"Missing dependency, firewall block, stale/conflicting instructions or memory, flaky test."},
+{"id":"D4-C11","d":4,"front":"Triage questions for a failed run?","back":"Did it understand the task? Did it call the right tools correctly? Did the environment allow success?"},
+{"id":"D4-C12","d":4,"front":"Fix for reasoning errors?","back":"Sharper acceptance criteria, plan validation, smaller tasks, examples."},
+{"id":"D4-C13","d":4,"front":"Fix for tool misuse?","back":"Correct tool config/allowlist, instructions on tool usage, remove unneeded tools."},
+{"id":"D4-C14","d":4,"front":"Fix for environment issues?","back":"copilot-setup-steps, firewall allowlist, prune or fix stale context, stabilize flaky tests."},
+{"id":"D4-C15","d":4,"front":"Five tuning levers?","back":"Instructions, workflows, constraints, memory usage, tool usage/access."},
+{"id":"D4-C16","d":4,"front":"Tuning loop?","back":"Evaluation set > baseline > classify failures > change ONE lever > re-run same set > compare > keep/revert."},
+{"id":"D4-C17","d":4,"front":"Why change one variable at a time?","back":"So you can attribute the improvement or regression to a specific change."},
+{"id":"D4-C18","d":4,"front":"Bad tuning moves?","back":"Tuning from one anecdote, changing many things at once, loosening permissions as a fix, adding instructions for an environment fault."},
+{"id":"D4-C19","d":4,"front":"How should instructions be written for tuning?","back":"Specific, testable, non-contradictory, with an explicit verification step (for example run tests before finishing)."},
+{"id":"D4-C20","d":4,"front":"Best way to compare plan vs result during analysis?","back":"Line up the plan, tool-call trace and final diff; find the first divergence."}
+]

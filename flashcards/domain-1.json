@@ -1,0 +1,22 @@
+[
+{"id":"D1-C01","d":1,"front":"Delegate-to-agent rule of thumb?","back":"Delegate when success is checkable automatically and failure is cheap to undo (well-scoped, verifiable, reversible)."},
+{"id":"D1-C02","d":1,"front":"Name 3 good first tasks for a coding agent.","back":"Tests for existing code, bug fixes with a failing repro, docs/dependency bumps/mechanical refactors."},
+{"id":"D1-C03","d":1,"front":"Name 3 poor candidates for autonomous delegation.","back":"Ambiguous requirements, cross-service architecture redesign, irreversible/production-affecting or security-critical work without review."},
+{"id":"D1-C04","d":1,"front":"Anti-pattern: no definition of done. Mitigation?","back":"Task template with objective acceptance criteria (tests, scans, scope limits)."},
+{"id":"D1-C05","d":1,"front":"Anti-pattern: one agent plans, codes, reviews and deploys. Mitigation?","back":"Separate roles / separation of duties (planner, executor, reviewer)."},
+{"id":"D1-C06","d":1,"front":"Three parts of a well-defined agent task?","back":"Inputs (goal, scope, constraints), outputs (draft PR, tests, log), success criteria (checkable)."},
+{"id":"D1-C07","d":1,"front":"How do you technically keep a planner from editing code?","back":"Give it read/search tools only (tool restriction in the custom agent)."},
+{"id":"D1-C08","d":1,"front":"Why should a plan be structured?","back":"So it can be validated (by people or automation) and compared with the final diff."},
+{"id":"D1-C09","d":1,"front":"What does 'validate the plan' check?","back":"Referenced files/tests exist, scope matches the task, criteria are met, risks and rollback noted."},
+{"id":"D1-C10","d":1,"front":"How do you prevent action until a plan is approved?","back":"A gate: approval label/comment/environment/re-assignment; executor write tools only enabled after approval."},
+{"id":"D1-C11","d":1,"front":"Planning vs reasoning vs action?","back":"Planning/reasoning are read-only analysis producing a plan; action mutates state (edit, commit, push, write tools)."},
+{"id":"D1-C12","d":1,"front":"Best natural checkpoint for human review of agent work on GitHub?","back":"The (draft) pull request."},
+{"id":"D1-C13","d":1,"front":"List inspectable artifacts from a cloud agent run.","back":"Draft PR, co-authored signed commits, session logs, comments, Actions logs and scan results."},
+{"id":"D1-C14","d":1,"front":"How to add human oversight without slowing delivery?","back":"Review at PR boundary, CODEOWNERS/rulesets for sensitive paths, async steering, auto-allow low-risk read-only actions."},
+{"id":"D1-C15","d":1,"front":"Why is 'approve every tool call' an anti-pattern?","back":"It slows delivery without materially reducing risk; approvals should be risk-proportional."},
+{"id":"D1-C16","d":1,"front":"Repo-wide instruction file path?","back":".github/copilot-instructions.md"},
+{"id":"D1-C17","d":1,"front":"Path-specific instruction files?","back":".github/instructions/*.instructions.md with applyTo frontmatter."},
+{"id":"D1-C18","d":1,"front":"Where do repo-level custom agents live?","back":".github/agents/ (*.agent.md files). Org-level agents use the github-private repo."},
+{"id":"D1-C19","d":1,"front":"What role does GitHub play for agents on this exam?","back":"System of record and control plane: issues, branches, PRs, Actions, rulesets, session logs."},
+{"id":"D1-C20","d":1,"front":"Strong vs weak success criteria?","back":"Strong: 'failing test added and passing, suite green, no new CodeQL alerts, only src/billing changed'. Weak: 'make it work'."}
+]

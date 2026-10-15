@@ -1,0 +1,126 @@
+#separator:tab
+#html:false
+#tags column:3
+Delegate-to-agent rule of thumb?	Delegate when success is checkable automatically and failure is cheap to undo (well-scoped, verifiable, reversible).	GH600 domain-1
+Name 3 good first tasks for a coding agent.	Tests for existing code, bug fixes with a failing repro, docs/dependency bumps/mechanical refactors.	GH600 domain-1
+Name 3 poor candidates for autonomous delegation.	Ambiguous requirements, cross-service architecture redesign, irreversible/production-affecting or security-critical work without review.	GH600 domain-1
+Anti-pattern: no definition of done. Mitigation?	Task template with objective acceptance criteria (tests, scans, scope limits).	GH600 domain-1
+Anti-pattern: one agent plans, codes, reviews and deploys. Mitigation?	Separate roles / separation of duties (planner, executor, reviewer).	GH600 domain-1
+Three parts of a well-defined agent task?	Inputs (goal, scope, constraints), outputs (draft PR, tests, log), success criteria (checkable).	GH600 domain-1
+How do you technically keep a planner from editing code?	Give it read/search tools only (tool restriction in the custom agent).	GH600 domain-1
+Why should a plan be structured?	So it can be validated (by people or automation) and compared with the final diff.	GH600 domain-1
+What does 'validate the plan' check?	Referenced files/tests exist, scope matches the task, criteria are met, risks and rollback noted.	GH600 domain-1
+How do you prevent action until a plan is approved?	A gate: approval label/comment/environment/re-assignment; executor write tools only enabled after approval.	GH600 domain-1
+Planning vs reasoning vs action?	Planning/reasoning are read-only analysis producing a plan; action mutates state (edit, commit, push, write tools).	GH600 domain-1
+Best natural checkpoint for human review of agent work on GitHub?	The (draft) pull request.	GH600 domain-1
+List inspectable artifacts from a cloud agent run.	Draft PR, co-authored signed commits, session logs, comments, Actions logs and scan results.	GH600 domain-1
+How to add human oversight without slowing delivery?	Review at PR boundary, CODEOWNERS/rulesets for sensitive paths, async steering, auto-allow low-risk read-only actions.	GH600 domain-1
+Why is 'approve every tool call' an anti-pattern?	It slows delivery without materially reducing risk; approvals should be risk-proportional.	GH600 domain-1
+Repo-wide instruction file path?	.github/copilot-instructions.md	GH600 domain-1
+Path-specific instruction files?	.github/instructions/*.instructions.md with applyTo frontmatter.	GH600 domain-1
+Where do repo-level custom agents live?	.github/agents/ (*.agent.md files). Org-level agents use the github-private repo.	GH600 domain-1
+What role does GitHub play for agents on this exam?	System of record and control plane: issues, branches, PRs, Actions, rulesets, session logs.	GH600 domain-1
+Strong vs weak success criteria?	Strong: 'failing test added and passing, suite green, no new CodeQL alerts, only src/billing changed'. Weak: 'make it work'.	GH600 domain-1
+Where do you configure MCP servers for cloud agent at repo level?	Repo Settings > Copilot > MCP servers, as JSON with a top-level mcpServers object.	GH600 domain-2
+Required MCP config keys for cloud agent?	type (local, stdio, http, sse) and tools (list of tool names or ["*"]).	GH600 domain-2
+Local MCP server keys?	command, args, optional env.	GH600 domain-2
+Remote MCP server keys?	url and optional headers.	GH600 domain-2
+Secret/variable naming for MCP config?	Agents secrets/variables whose names start with COPILOT_MCP_; referenced as $VAR, ${VAR} or ${VAR:-default}.	GH600 domain-2
+Why allowlist specific read-only tools?	Copilot uses configured MCP tools autonomously and does not ask for approval first.	GH600 domain-2
+MCP limits for cloud agent and code review?	Tools only (no resources/prompts) and no remote servers requiring OAuth.	GH600 domain-2
+Which MCP servers are on by default for cloud agent?	GitHub MCP server and Playwright MCP server.	GH600 domain-2
+Default GitHub MCP token scope?	Read-only, current repository only. Use a fine-grained PAT or GitHub App for wider access.	GH600 domain-2
+Remote GitHub MCP URLs?	https://api.githubcopilot.com/mcp/ and the read-only https://api.githubcopilot.com/mcp/readonly	GH600 domain-2
+How do you select toolsets on the remote GitHub MCP server?	X-MCP-Toolsets header (for example repos,issues,pull_requests); pick individual tools with the tools field.	GH600 domain-2
+How do you validate MCP config?	Assign an issue to Copilot, View session, open the 'Start MCP Servers' step in the log and check the listed tools.	GH600 domain-2
+Code review MCP tool requirement?	Each tool must set annotations.readOnlyHint to true or it is excluded.	GH600 domain-2
+Where is the environment setup workflow and what must the job be called?	.github/workflows/copilot-setup-steps.yml, job name copilot-setup-steps.	GH600 domain-2
+MCP server needs uv or pipx that is not on the runner. Fix?	Install it in copilot-setup-steps.yml.	GH600 domain-2
+Agent blocked by firewall on one host. Fix?	Add that host to the custom allowlist; do not disable the firewall.	GH600 domain-2
+Which branch can cloud agent push to?	One branch: a new copilot/ branch, or the PR branch when @copilot is mentioned on an existing PR. Branch protections still apply.	GH600 domain-2
+What can't cloud agent do to its own PR?	Mark Ready for review, approve, or merge. It also cannot run arbitrary git commands.	GH600 domain-2
+Do workflows run on agent PRs automatically?	No (default). A user with write access must click Approve and run workflows.	GH600 domain-2
+Retry policy for transient vs deterministic errors?	Transient: bounded retries with backoff, then escalate. Deterministic (denied, invalid config): do not retry; fix or escalate.	GH600 domain-2
+How do you roll back a bad agent change before merge?	Close the draft PR or revert commits on the copilot/ branch; the default branch is unaffected.	GH600 domain-2
+Traceability features of agent commits?	Authored by Copilot, requester as co-author, signed (Verified), message links to session log; admins get audit log events.	GH600 domain-2
+How can admins restrict which MCP servers are usable?	Org/enterprise MCP allowlist and registry policies (optionally restricting to registry servers). Verify names in docs.	GH600 domain-2
+Short-term vs long-term vs external memory?	Short-term: current context window/session. Long-term: persisted across sessions (Copilot Memory, instructions). External: systems of record (issues, PRs, files, databases).	GH600 domain-3
+What does Copilot Memory store?	Repository-level facts and user-level preferences.	GH600 domain-3
+How are repo-level facts validated?	Stored with citations to code; checked against the current branch before use; only validated facts are used.	GH600 domain-3
+Copilot Memory expiry rule?	Entries unused for 28 days are deleted automatically; successful validation/use can reset the timer.	GH600 domain-3
+Who can cause repo-level facts to be created?	Users with write access to the repo who have Copilot Memory enabled.	GH600 domain-3
+Who can review and delete repo-level facts?	Repository owners.	GH600 domain-3
+Who can see user-level preferences?	Only that user's interactions; the user can view/delete them; admins can export/delete on Business/Enterprise.	GH600 domain-3
+Which features use Copilot Memory?	Cloud agent, code review, Copilot CLI and agentic autofix. Code review uses repo-level facts only.	GH600 domain-3
+How is Copilot Memory enabled?	Per user. Org/enterprise admins enable the policy first, then users can opt out. Individual plans: on by default.	GH600 domain-3
+Where should stable conventions live vs task progress?	Conventions in reviewed instruction files; progress and decisions in durable external artifacts (PR checklist, PROGRESS.md, issue comments).	GH600 domain-3
+Name 4 durable state artifacts.	PR description checklist, progress/decision file on the branch, issue comments, explanatory commit messages.	GH600 domain-3
+How should an agent resume interrupted work?	Read artifacts and diff, verify recorded state against reality, use idempotent steps, honor prior decisions unless superseded with a note.	GH600 domain-3
+What is context drift?	Gradual divergence from the original intent in long runs: forgotten constraints, scope creep, contradicted decisions.	GH600 domain-3
+How do you detect drift?	Compare work to acceptance criteria/plan at checkpoints; watch diff size vs scope and violations of instructions.	GH600 domain-3
+How do you correct drift?	Re-anchor goal and constraints, revert off-scope changes, split the task, restart a fresh session seeded from artifacts.	GH600 domain-3
+How do you share agent state across tools?	Through repository and GitHub objects and shared memory, not chat history.	GH600 domain-3
+How do you prevent conflicting context?	One source of truth per fact; resolve contradictions by fixing or deleting one source.	GH600 domain-3
+How do you prevent stale context?	Validate against current code, expire entries, re-verify before acting.	GH600 domain-3
+Why scope memory to task-relevant info?	Irrelevant context buries key instructions, raises cost and causes errors; use path-specific instructions and focused links.	GH600 domain-3
+What should a memory pruning/reset policy define?	Who writes, how validated, when it expires, who can delete, how to reset.	GH600 domain-3
+Outcomes vs operational constraints?	Outcomes: what must be true (behavior, tests, docs). Constraints: what must not happen (off-limit files, no new deps, budgets).	GH600 domain-4
+Name 4 quantitative evaluation signals.	CI/test pass rate, coverage or test-count change, scan findings (CodeQL, lint), diff size vs scope, review iterations, time to merge, revert rate, cost.	GH600 domain-4
+Name 3 qualitative signals.	Reviewer judgment of correctness/clarity, adherence to conventions, PR description quality, trust to merge.	GH600 domain-4
+What does 'align evaluation with development intent' protect against?	Gaming metrics, e.g. deleting a failing test or swallowing exceptions so checks go green without solving the real problem.	GH600 domain-4
+Cloud agent's built-in validation tools?	CodeQL, Advisory Database check for new dependencies, secret scanning, plus Copilot code review. No GHAS license required.	GH600 domain-4
+Where do you inspect what an agent did and saw?	Session logs (also plans, tool-call traces, outputs, PR timeline, workflow artifacts).	GH600 domain-4
+Three root-cause classes?	Reasoning errors, tool misuse, context/environment issues.	GH600 domain-4
+Example of a reasoning error?	Misreading the requirement, scope creep, ignoring a stated constraint, wrong plan.	GH600 domain-4
+Example of tool misuse?	Wrong arguments, wrong tool, repeating a failing call, denied tool, MCP server not started.	GH600 domain-4
+Example of context/environment issue?	Missing dependency, firewall block, stale/conflicting instructions or memory, flaky test.	GH600 domain-4
+Triage questions for a failed run?	Did it understand the task? Did it call the right tools correctly? Did the environment allow success?	GH600 domain-4
+Fix for reasoning errors?	Sharper acceptance criteria, plan validation, smaller tasks, examples.	GH600 domain-4
+Fix for tool misuse?	Correct tool config/allowlist, instructions on tool usage, remove unneeded tools.	GH600 domain-4
+Fix for environment issues?	copilot-setup-steps, firewall allowlist, prune or fix stale context, stabilize flaky tests.	GH600 domain-4
+Five tuning levers?	Instructions, workflows, constraints, memory usage, tool usage/access.	GH600 domain-4
+Tuning loop?	Evaluation set > baseline > classify failures > change ONE lever > re-run same set > compare > keep/revert.	GH600 domain-4
+Why change one variable at a time?	So you can attribute the improvement or regression to a specific change.	GH600 domain-4
+Bad tuning moves?	Tuning from one anecdote, changing many things at once, loosening permissions as a fix, adding instructions for an environment fault.	GH600 domain-4
+How should instructions be written for tuning?	Specific, testable, non-contradictory, with an explicit verification step (for example run tests before finishing).	GH600 domain-4
+Best way to compare plan vs result during analysis?	Line up the plan, tool-call trace and final diff; find the first divergence.	GH600 domain-4
+Orchestrator-worker pattern?	A coordinator decomposes work, delegates to specialized agents and aggregates results (hub-and-spoke).	GH600 domain-5
+Sequential pipeline pattern?	Agents in a chain; each stage consumes the previous output (planner > implementer > tester > reviewer).	GH600 domain-5
+Parallel fan-out/fan-in?	Many agents work independently at once, then results are merged.	GH600 domain-5
+Generator-critic (evaluator-optimizer)?	One agent produces, another critiques, looping until criteria are met.	GH600 domain-5
+Event-driven pattern?	Agents react to GitHub events such as labels or issue creation.	GH600 domain-5
+How do you isolate parallel agents?	Separate branches/sessions/worktrees/environments with disjoint file ownership; share only via commits and artifacts.	GH600 domain-5
+Three multi-agent conflict types?	Overlapping code changes, duplicated effort, contradictory outputs.	GH600 domain-5
+Resolve overlapping code changes?	Serialize, rebase, re-partition ownership, or integrate via an integrator agent/human.	GH600 domain-5
+Prevent duplicated effort?	Claim work before starting (assignment, label, sub-issue) and check existing claims.	GH600 domain-5
+Resolve contradictory outputs?	Escalate to an arbiter (human or designated agent) and record the decision in one place.	GH600 domain-5
+What goes in a hand-off record?	Who handed what (inputs, outputs, assumptions) to whom, plus decisions and why.	GH600 domain-5
+Artifacts that make multi-agent work auditable?	One PR per agent task, linked issues, session logs, scan results, decision log.	GH600 domain-5
+Evidence for post-hoc analysis?	Session logs, commit co-author trails, audit log events, PR/issue timelines.	GH600 domain-5
+Four failure states to detect?	Failed, partial, stalled, degraded.	GH600 domain-5
+Handling a stalled agent?	Detect via timeout/heartbeat; cancel, roll back partial work, re-queue or escalate.	GH600 domain-5
+Handling partial execution?	Resume from a checkpoint idempotently or roll back; do not restart blindly.	GH600 domain-5
+Circuit breaker?	Stop routing work to an agent that keeps failing/degrading; fall back to a human or alternative while investigating.	GH600 domain-5
+Safely add an agent to a live workflow?	Define role, tools and hand-off contract; review its definition via PR; pilot on low-risk tasks.	GH600 domain-5
+Safely update or replace an agent?	Version definitions, roll out gradually, drain or hand off in-flight work, keep hand-off contracts backward compatible.	GH600 domain-5
+Safely retire an agent?	Stop new routing, finish/reassign in-flight work, preserve logs/PRs/decision records, document the replacement.	GH600 domain-5
+How do you classify agent actions for autonomy?	By operational, security and compliance risk (and reversibility); assign the lowest safe level of human involvement.	GH600 domain-6
+Goal when assigning autonomy levels?	Maximize delivery speed while remaining compliant with security and Responsible AI standards.	GH600 domain-6
+Which actions always need explicit authorization or a controlled path?	Irreversible or compliance-sensitive ones: production deploys, data deletion, secrets and permission changes.	GH600 domain-6
+Instructions vs technical enforcement?	Instructions are advisory; allowlists, firewall, rulesets, required checks and hooks cannot be bypassed by the model.	GH600 domain-6
+Name five technical guardrails.	Tool allowlists, firewall, rulesets/branch protection, required reviews/CODEOWNERS, push protection/code scanning, org policies, hooks.	GH600 domain-6
+Least-privilege MCP/token practice?	Read-only tools and endpoints, fine-grained PAT or GitHub App scoped to specific repos, narrow tools list.	GH600 domain-6
+How do you preserve velocity with guardrails?	Risk-based approvals at PR level, async review, auto-allow read-only actions, no approvals that do not reduce risk.	GH600 domain-6
+Who can trigger cloud agent?	Users with write access. Comments from users without write access are never shown to it.	GH600 domain-6
+Cloud agent PR rules?	Draft PRs need human review and merge; agent cannot mark ready, approve or merge; requester cannot approve.	GH600 domain-6
+Extra approval rule?	PRs opened under the agent's own identity need one additional approval if the repo already requires approvals (ruleset default; always for branch protection).	GH600 domain-6
+Workflows on agent PRs?	Do not run until a user with write access clicks Approve and run workflows (configurable).	GH600 domain-6
+Prompt-injection mitigation built into cloud agent?	Hidden characters filtered (for example HTML comments are not passed); non-write users' comments excluded.	GH600 domain-6
+Sensitive-data mitigation?	Restricted internet access via the firewall (customizable allowlist).	GH600 domain-6
+Accountability features for agent commits?	Copilot as author, requester as co-author, signed (Verified), link to session logs; admin audit log events.	GH600 domain-6
+Automation guardrails?	Attributed to creator, you choose exactly which tools it can use, untrusted-user events ignored by default, workflows still need human approval.	GH600 domain-6
+What decisions require human judgment?	Ambiguity, business/ethical trade-offs, security-sensitive and irreversible changes.	GH600 domain-6
+How do you gate a production deploy by an agent?	Protected environment with required reviewers (explicit authorization), plus protected branch and checks.	GH600 domain-6
+Why is 'approve every tool call' bad?	It adds friction without materially reducing risk; the exam favors risk-proportional controls.	GH600 domain-6
+Who is accountable for merged agent code?	Humans: reviewers and the team. 'The agent did it' is not a control.	GH600 domain-6
+What does the study guide link for guardrails?	The Build guardrails tutorial and the Risks and mitigations page for cloud agent.	GH600 domain-6

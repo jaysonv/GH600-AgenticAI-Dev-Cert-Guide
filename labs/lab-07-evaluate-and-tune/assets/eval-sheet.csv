@@ -1,0 +1,6 @@
+task,expected_outcome,constraints,run,tests_pass,codeql_alerts,files_out_of_scope,review_rounds,failure_class,evidence_link,change_made
+#1 parse_price,"handles $1,234.50 + test added","no signature change",baseline,,,,,,,
+#2 average empty,"returns 0.0 + test","no new deps",baseline,,,,,,,
+#3 format_price,"returns $1,234.50 style","stdlib only",baseline,,,,,,,
+#5 clamp_discount,"0-100 clamp used in apply_discount","only shop.py/test_shop.py",baseline,,,,,,,
+#6 docstrings,"all public functions documented","no behavior change",baseline,,,,,,,
